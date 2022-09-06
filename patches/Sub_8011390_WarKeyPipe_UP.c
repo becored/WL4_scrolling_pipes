@@ -1,4 +1,4 @@
-// @Description MC_Sub_8011390_WarKeyPipe_UP
+// @Description Sub_8011390_WarKeyPipe_UP
 // @HookAddress 0x2DEE04
 // @HookString P
 // Mode: Thumb
@@ -132,7 +132,7 @@ struct WJEffDef {
 
 #define byte_8316078 ((volatile unsigned char*) 0x8316078)
 
-int MC_Sub_8011390_WarKeyPipe_UP() {
+int Sub_8011390_WarKeyPipe_UP() {
 		int tile16_eventID;
 		tile16_eventID = Sub_806DAC0_PanelYakuAllNum_TileEventId((Wario_usPosY + 54) & 0xFFFF, Wario_usPosX) >> 16;
 		switch ( tile16_eventID )	{

@@ -1,6 +1,6 @@
-// @Description Sub_8011390_WarKeyPipe_DOWN
-// @HookAddress 0x2DEE08
-// @HookString P
+// @Description Sub_8012BAC_GmWarioChng
+// @HookAddress 0x12BAE
+// @HookString 024b 9e46024b 18470000 c12c0108 P
 // Mode: Thumb
 // Made by beco
 
@@ -87,29 +87,33 @@ enum WAR_STAT_NORMAL {
 	GOWALK,					//ゴー
 };
 
-struct WJEffDef {
-	unsigned char ucStat;
-	unsigned char ucAnmTimer;			//アニメタイマー
-	unsigned char ucAnmPat;			//アニメパターン
-	unsigned short usPosX;				//Ｘ
-	unsigned short usPosY;				//Ｙ
-	unsigned long iAnmAddr;			//アドレス
+struct CapDef {
+	char ucStat;				//状態
+	char ucAnmTimer;		//アニメタイマー
+	char ucAnmPat;			//アニメパターン
+	short *pObjData;   	//OBJデータアドレス
 };
 
-#define Sub_8001DA4_m4aSongNumStart ((int (*)(int)) 0x8001DA5)
-#define Sub_806DAC0_PanelYakuAllNum_TileEventId ((int (*)(unsigned short,unsigned short)) 0x806DAC1)
+struct WEffDef {
+	char ucKind;				//0:なし 1:泡 2:バネ効果 3:ダッシュ効果 4:こうもり煙 5:汗
+	char ucStat;				//状態
+	char ucAnmTimer;		//アニメタイマー
+	char ucAnmPat;			//アニメパターン
+	short *pObjData;		//OBJデータアドレス
+};
 
-#define PassageID (*(volatile unsigned char*) 0x3000002)
-#define InPassageLevelID (*(volatile unsigned char*) 0x3000003)
-#define ucDisConFlg (*(volatile unsigned char*) 0x3000012)
-#define CurrentRoomId (*(volatile unsigned char*) 0x3000024)
-#define ucGateNum (*(volatile unsigned char*) 0x3000025)
-#define ucTimeUp (*(volatile unsigned char*) 0x3000047)
+#define Sub_8001DA4_m4aSongNumStart ((void (*)(int)) 0x8001DA5)
+#define Sub_800FD28_WarParClear ((void (*)()) 0x800FD29)
+#define Sub_8012CC8_WarChng_Flying ((void (*)()) 0x8012CC9)
+#define Sub_8012E5C_WarChng_Landing ((void (*)()) 0x8012E5D)
+#define Sub_801318C_WarChng_Other ((void (*)(unsigned char)) 0x801318D)
+#define Sub_8094ED0__modsi3 ((int (*)(int,int)) 0x8094ED1)
+#define Sub_80950D8_memcpy ((void (*)(int,int,int)) 0x80950D9)
+#define Sub_8014090_WarHeadCheck ((int (*)(unsigned short,unsigned int,int)) 0x8014091)
+
 #define sGameSeq (*(volatile unsigned short*) 0x3000C3C)
-#define cGmStartFlg (*(volatile unsigned char*) 0x3000C3F)
 #define KeyPressContinuous ((volatile unsigned short*) 0x3001844)
 #define usTrg_KeyPress1Frame ((volatile unsigned short*) 0x3001848)
-#define usBgEvy (*(volatile unsigned char*) 0x3001870)
 #define Wario_ucReact (*(volatile unsigned char*) 0x3001898)
 #define Wario_ucStat (*(volatile unsigned char*) 0x3001899)
 #define Wario_ucDokan (*(volatile unsigned char*) 0x300189A)
@@ -124,29 +128,84 @@ struct WJEffDef {
 #define Wario_ucAnmPat (*(volatile unsigned char*) 0x30018B7)
 #define Wario_sMvSpeedX (*(volatile signed short*) 0x30018AE)
 #define Wario_sMvSpeedY (*(volatile signed short*) 0x30018B0)
-#define WarJEff ((volatile struct WJEffDef*) 0x3001950)
-#define WarJEff_LOBYTE (*(volatile unsigned char*) 0x3001950)
-#define WarioLift (*(volatile unsigned char*) 0x3001948)
-#define usWarStopFlg (*(volatile unsigned char*) 0x30019F6)
-#define ucWarOffFlg (*(volatile unsigned char*) 0x30019F8)
+#define WarBk_ucReact (*(volatile unsigned char*) 0x30018D4)
+#define WarBk_ucStat (*(volatile unsigned char*) 0x30018D5)
+#define WarBk_ucJpFlg (*(volatile unsigned char*) 0x30018DC)
+#define WarBk_usSlope (*(volatile signed short*) 0x30018F0)
+#define WarCap (*(volatile struct CapDef*) 0x3001930)
+#define WarEff (*(volatile struct WEffDef*) 0x3001940)
+#define unk_3001934 (*(volatile unsigned char*) 0x3001934)
 
-#define byte_8316078 ((volatile unsigned char*) 0x8316078)
-
-int Sub_8011390_WarKeyPipe_DOWN() {
-		int tile16_eventID;
-		tile16_eventID = Sub_806DAC0_PanelYakuAllNum_TileEventId((Wario_usPosY - 178) & 0xFFFF, Wario_usPosX) >> 16;
-		switch ( tile16_eventID )	{
-			case 0x9:
-			case 0xA:
-				Wario_ucDokan = 0;
-				return 254;
-			default:
-				break;
+void Sub_8012BAC_GmWarioChng(unsigned char a1) {
+  unsigned char v1; // r4
+  v1 = a1;
+  Sub_800FD28_WarParClear();
+  WarCap.ucStat = 0;
+  WarCap.ucAnmTimer = 0;
+  WarCap.ucAnmPat = 0;
+  WarCap.pObjData = 0;
+  if ( WarEff.ucKind != 4 )
+  {
+    WarEff.ucKind = 0;
+    WarEff.ucStat = 0;
+    WarEff.ucAnmTimer = 0;
+    WarEff.ucAnmPat = 0;
+    WarEff.pObjData = 0;
+  }
+	if ( Wario_ucDokan ) {
+    Wario_ucDokan = 2;
+		if ( Wario_ucStat == DOKANU )
+		{
+			Wario_sMvSpeedY = 64;
 		}
-		if ( Wario_ucAnmTimer < byte_8316078[12 * Wario_ucAnmPat + 8] )
-			return 255;
-		Wario_ucAnmTimer = 0;
-		if ( byte_8316078[12 * ++Wario_ucAnmPat + 8] )
-			return 255;
-		return 254;
+		else if ( Wario_ucStat == DOKAND )
+		{
+			Wario_sMvSpeedY = -64;
+		}
+	}
+  else if ( sGameSeq == 4 )                     // game is paused
+  {
+    sGameSeq = 2;
+    Wario_ucAnmPat = 2;
+  }
+  else                                          // game is not paused
+  {
+    Wario_ucDokan = 0;
+    if ( v1 == 5 && WarBk_usSlope & 1 )
+      v1 = 0xC;
+    if ( v1 == 0x1F )
+    {
+      if ( Sub_8014090_WarHeadCheck(0, 0xFFC0, 1) )
+      {
+        Sub_80950D8_memcpy(&Wario_ucReact, &WarBk_ucReact, 0x3C);
+        return;
+      }
+      if ( KeyPressContinuous[0] & 1 )
+      {
+        WarBk_ucJpFlg = 1;
+        v1 = 0xFE;
+      }
+    }
+    if ( WarBk_ucStat == TAME )
+    {
+      if ( v1 != THROW2 && v1 != TAMETURN )
+        Sub_8001DA4_m4aSongNumStart(40);        // B dash jump sfx
+    }
+    else if ( WarBk_ucStat == TAMETURN && v1 != 0x25 && v1 != 0x23 )
+    {
+      Sub_8001DA4_m4aSongNumStart(40);          // B dash jump sfx
+    }
+    if ( v1 == 0xFE )
+    {
+      Sub_8012CC8_WarChng_Flying();             // full jump when holding A
+    }
+    else if ( v1 == 0xFD )
+    {
+      Sub_8012E5C_WarChng_Landing();
+    }
+    else
+    {
+      Sub_801318C_WarChng_Other(v1);            // bouncing
+    }
+  }
 }
