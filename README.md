@@ -1,6 +1,6 @@
 # Wario Land 4: Screen Scrolling Pipes
 
-## How to use
+## How to Apply
 Patch "WL4_scrolling_pipes_v1.0.bps" to a ***vanilla*** Wario Land 4(US) rom  
 ***This patch is only for unmodified rom, you can't apply this patch for modified rom!***  
   
